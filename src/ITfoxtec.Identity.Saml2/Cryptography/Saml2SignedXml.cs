@@ -46,10 +46,14 @@ namespace ITfoxtec.Identity.Saml2.Cryptography
                 throw new InvalidSignatureException("Invalid XML signature reference.");
             }
 
-            var referenceId = (SignedInfo.References[0] as Reference).Uri.Substring(1);
-            if (Element != GetIdElement(Element.OwnerDocument, referenceId))
+            var reference = SignedInfo.References[0] as Reference;
+            if (!string.IsNullOrEmpty(reference?.Uri))
             {
-                throw new InvalidSignatureException("XML signature reference do not refer to the root element.");
+                var referenceId = reference.Uri.Substring(1);
+                if (Element != GetIdElement(Element.OwnerDocument, referenceId))
+                {
+                    throw new InvalidSignatureException("XML signature reference do not refer to the root element.");
+                }
             }
 
             var canonicalizationMethodValid = SignedInfo.CanonicalizationMethod == CanonicalizationMethod;
